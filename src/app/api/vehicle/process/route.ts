@@ -3,22 +3,12 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 
+// Config with fallback values
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hhifxpouzuwzbmrbegmg.supabase.co'
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_Zf_OlRWyy5Z2opeTe1Nh5w_RxIQC4vg'
+
 export async function POST(request: NextRequest) {
   try {
-    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      console.error('Missing environment variables:', { 
-        hasUrl: !!SUPABASE_URL, 
-        hasKey: !!SUPABASE_ANON_KEY 
-      })
-      return NextResponse.json(
-        { error: 'Server configuration error' },
-        { status: 500 }
-      )
-    }
-
     const body = await request.json()
     const { vin, files, photos } = body
 
@@ -93,16 +83,6 @@ export async function POST(request: NextRequest) {
 // GET: Retrieve processing job status
 export async function GET(request: NextRequest) {
   try {
-    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      return NextResponse.json(
-        { error: 'Server configuration error' },
-        { status: 500 }
-      )
-    }
-
     const { searchParams } = new URL(request.url)
     const jobId = searchParams.get('jobId')
     const vin = searchParams.get('vin')
