@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 
@@ -18,6 +19,7 @@ interface VehicleJob {
 }
 
 export default function AdminDashboard() {
+  const router = useRouter()
   const [jobs, setJobs] = useState<VehicleJob[]>([])
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({
@@ -28,6 +30,12 @@ export default function AdminDashboard() {
   })
 
   useEffect(() => {
+    // Check auth
+    const isAuth = localStorage.getItem('admin_auth')
+    if (!isAuth) {
+      router.push('/admin/login')
+      return
+    }
     fetchJobs()
   }, [])
 

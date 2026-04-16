@@ -22,7 +22,7 @@ export default function Navigation() {
     { href: '/about', label: 'About Us' },
     { href: '/how-it-works', label: 'How It Works' },
     { href: '/contact', label: 'Contact' },
-    { href: '/admin', label: 'Admin', admin: true },
+    { href: '/admin/login', label: 'Admin', admin: true },
   ]
 
   return (
