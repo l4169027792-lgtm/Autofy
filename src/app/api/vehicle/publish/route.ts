@@ -3,14 +3,11 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
 // Locked fields that cannot be modified
 const LOCKED_FLAGS = ['total_loss', 'structural_damage', 'airbag_deployment', 'flood_damage', 'rebuilt_title']
 
 // Check for compliance issues before publishing
-async function checkPublishCompliance(jobId: string, narrative: string, historyFlags: any) {
+async function checkPublishCompliance(SUPABASE_URL: string, SUPABASE_ANON_KEY: string, jobId: string, narrative: string, historyFlags: any) {
   const warnings: { type: string, message: string }[] = []
   
   // Check if locked flags exist in draft
@@ -56,6 +53,13 @@ async function checkPublishCompliance(jobId: string, narrative: string, historyF
 // POST: Publish the vehicle
 export async function POST(request: NextRequest) {
   try {
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
+
     const body = await request.json()
     const { jobId, userId, finalOutput } = body
 
@@ -110,7 +114,7 @@ export async function POST(request: NextRequest) {
     const narrative = finalOutput?.story_narrative || draft.story_narrative
 
     // Check compliance before publishing
-    const compliance = await checkPublishCompliance(jobId, narrative, draft)
+    const compliance = await checkPublishCompliance(SUPABASE_URL, SUPABASE_ANON_KEY, jobId, narrative, draft)
 
     // Combine all warnings
     const allWarnings = [
@@ -228,6 +232,13 @@ export async function POST(request: NextRequest) {
 // GET: Get published version
 export async function GET(request: NextRequest) {
   try {
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
+
     const { searchParams } = new URL(request.url)
     const jobId = searchParams.get('jobId')
 

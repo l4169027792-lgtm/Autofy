@@ -3,10 +3,6 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY!
-
 // Regeneration prompts for each section
 const REGENERATION_PROMPTS: Record<string, string> = {
   headline: 'Rewrite the listing headline. Keep it under 12 words, OMVIC-compliant, and engaging.',
@@ -17,6 +13,14 @@ const REGENERATION_PROMPTS: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
   try {
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY
+    
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !ANTHROPIC_API_KEY) {
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
+
     const body = await request.json()
     const { jobId, section, instruction, context, userId } = body
 

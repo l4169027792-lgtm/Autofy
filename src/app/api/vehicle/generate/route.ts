@@ -7,6 +7,17 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY!
 
+// Move env vars check inside handler
+function getEnvVars() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const anthropic = process.env.ANTHROPIC_API_KEY
+  if (!url || !key || !anthropic) {
+    throw new Error('Missing environment variables')
+  }
+  return { SUPABASE_URL: url, SUPABASE_ANON_KEY: key, ANTHROPIC_API_KEY: anthropic }
+}
+
 // System prompt for Claude (from Vehicle Story Engine spec)
 const SYSTEM_PROMPT = `You are the Autofy Vehicle Disclosure Specialist – an AI trained to analyze automotive documents and photos, extract accurate vehicle data, and write honest, buyer-first disclosure narratives for Canadian used car listings.
 
@@ -135,6 +146,8 @@ Never invent or assume data that is not present in the uploaded files.`
 
 export async function POST(request: NextRequest) {
   try {
+    const { SUPABASE_URL, SUPABASE_ANON_KEY, ANTHROPIC_API_KEY } = getEnvVars()
+    
     const body = await request.json()
     const { jobId, vin, pdfBase64, photoBase64Array } = body
 

@@ -3,9 +3,6 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
 // Banned phrases for OMVIC compliance
 const BANNED_PHRASES = [
   'not a write-off',
@@ -30,7 +27,7 @@ function checkCompliance(
   const narrativeLower = narrative?.toLowerCase() || ''
   for (const phrase of BANNED_PHRASES) {
     if (narrativeLower.includes(phrase.toLowerCase())) {
-      warnings.push(`Banned phrase detected: "${phrase}"`)
+      warnings.push(`Banned phrase detected: \"${phrase}\"`)
     }
   }
   
@@ -56,6 +53,13 @@ function checkCompliance(
 // PUT: Save draft edits
 export async function PUT(request: NextRequest) {
   try {
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
+
     const body = await request.json()
     const { jobId, edits, userId } = body
 
@@ -217,6 +221,13 @@ export async function PUT(request: NextRequest) {
 // GET: Get draft output
 export async function GET(request: NextRequest) {
   try {
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
+
     const { searchParams } = new URL(request.url)
     const jobId = searchParams.get('jobId')
 
@@ -239,18 +250,6 @@ export async function GET(request: NextRequest) {
     )
     const draftData = await draftResponse.json()
 
-    // Get history flags
-    const flagsResponse = await fetch(
-      `${SUPABASE_URL}/rest/v1/vehicle_history_flags?job_id=eq.${jobId}`,
-      {
-        headers: {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-        }
-      }
-    )
-    const flagsData = await flagsResponse.json()
-
     // Get compliance warnings
     const warningsResponse = await fetch(
       `${SUPABASE_URL}/rest/v1/compliance_warnings?job_id=eq.${jobId}&is_resolved=eq.false`,
@@ -265,7 +264,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       draft: draftData[0] || null,
-      historyFlags: flagsData,
       complianceWarnings: warningsData
     })
 
