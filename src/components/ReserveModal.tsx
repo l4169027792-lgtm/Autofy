@@ -12,9 +12,9 @@ interface ReserveModalProps {
     year: number
     make: string
     model: string
-    trim?: string
+    trim?: string | null
     price: number
-    image_url?: string
+    image_url?: string | null
   }
 }
 
