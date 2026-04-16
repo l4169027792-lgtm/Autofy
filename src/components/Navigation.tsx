@@ -22,6 +22,7 @@ export default function Navigation() {
     { href: '/about', label: 'About Us' },
     { href: '/how-it-works', label: 'How It Works' },
     { href: '/contact', label: 'Contact' },
+    { href: '/admin', label: 'Admin', admin: true },
   ]
 
   return (
@@ -45,9 +46,11 @@ export default function Navigation() {
             key={link.href}
             href={link.href}
             className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all ${
-              pathname === link.href
-                ? 'text-red bg-red-light'
-                : 'text-text-2 hover:text-red hover:bg-red-light'
+              link.admin
+                ? 'bg-gray-800 text-white hover:bg-gray-700'
+                : pathname === link.href
+                  ? 'text-red bg-red-light'
+                  : 'text-text-2 hover:text-red hover:bg-red-light'
             }`}
           >
             {link.label}
